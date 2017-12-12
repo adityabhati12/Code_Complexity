@@ -1,22 +1,35 @@
 from flask import Flask
 from git import Repo
+from flask import request
 import subprocess
 import os
-import git
 import shutil
 from dask.distributed import Client
 import time
 
 
 app = Flask(__name__)
-client = Client('127.0.0.1:8786')
+s = Client('127.0.0.1:8786')
 
 
 @app.route('/CODECOMPLEXITY')
 def Get_repo():
-    DIR_NAME = "C:/Users/user/PycharmProjects1"
-    REMOTE_URL = "https://github.com/adityabhati12/SCALABLE-COMPUTING---CHAT-SERVER.git"
-    Repo.clone_from(REMOTE_URL, DIR_NAME)
+    list = []
+    user = request.args.get('user')
+    user_name = (user.split('/')[-1]).split('.')[0]
+    print user_name
+    method = "C:/Users/user/Documents/Storage1/" + user_name
+    Repo.clone_from(user, method)
+    if os.path.isdir(user + "/.git"):
+        shutil.rmtree(user + "/.git")
+    method = os.path.expanduser(method)
+    if os.path.isdir(method):
+        os.path.walk(method, create_blocks, list)
+    print len(list)
+
+    distributed_codecomplexity(list)
+    # if os.path.isdir(method):
+    #     shutil.rmtree(method)
     return 'repository cloned'
 
 def create_blocks(list, blocks , directory):
@@ -32,18 +45,18 @@ def cyclomatic_c(method):
                                       executable='/bin/bash')
     cc = subprocess.Popen(["radon cc \"" + method + "\" -s -j"], stdout=subprocess.PIPE, shell=True,
                                              executable='/bin/bash')
-    (r_output, a1) = r_cc.communicate()
+    (r_cc_output, a1) = r_cc.communicate()
     (cc ,a2) = cc.communicate()
-    return cc + r_output
+    return cc + r_cc_output
+    print (cc + r_cc_output)
 
 
-def distributed_codecomplexity(blocks):
+
+def distributed_codecomplexity(list):
     t1 = time.time()
-    mapper = client.map(cyclomatic_c, blocks )
-    print client.gather(mapper)
+    mapper = s.map(cyclomatic_c, list )
+    print s.gather(mapper)
     print("%s" % (time.time()-t1))
-
-
 
 
 if __name__ == '__main__':
