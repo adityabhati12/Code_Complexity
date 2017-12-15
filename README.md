@@ -23,6 +23,10 @@ open Terminal
 >dask-scheduler
 
 >dask-worker LOCAL IP: PORT
+```
+Dask host : 127.0.0.1
+Dask Port : 8786
+```
 
 > Then run CodeComplexity.py
 
