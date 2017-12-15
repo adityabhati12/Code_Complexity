@@ -28,7 +28,10 @@ open Terminal
 
 ### Analysis
 
-```While implementing this  project as the number of worker were incresed time taken to clone the repositories was decreased.```
+```
+While implementing this  project as the number of worker were incresed time taken to clone the repositories was decreased.
+```
+
 
 
 
